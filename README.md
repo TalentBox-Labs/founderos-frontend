@@ -1,18 +1,19 @@
 # WorkCrew CRM — Frontend
 
 React (Vite) frontend for the WorkCrew CRM platform. Connects to the FastAPI
-backend (`runner_api.py`) running on port 8000.
+backend in [`founderos-backend`](https://github.com/TalentBox-Labs/founderos-backend)
+(`runner_api.py`), which this repo is checked out as a git submodule for
+local production builds — see that repo's Dockerfile.
 
 ## Prerequisites
 
 - Node.js 18+ (`node --version`)
-- The backend running: `python3 -m uvicorn runner_api:app --host 127.0.0.1 --port 8000`
-  (from the repo root)
+- The backend running (see `founderos-backend`'s README):
+  `python3 -m uvicorn runner_api:app --host 127.0.0.1 --port 8000`
 
 ## Run it
 
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
