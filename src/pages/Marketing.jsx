@@ -26,7 +26,7 @@ const MARKETING_AGENT_GROUPS = [
         fields: [{ key: 'query', label: 'Topic', placeholder: 'e.g. staffing agency software' }] },
       { key: 'brand', label: 'Brand Monitoring', endpoint: 'brand-monitoring',
         blurb: 'Scans Reddit for brand mentions and flags negative sentiment.',
-        fields: [{ key: 'brand_name', label: 'Brand name', placeholder: 'e.g. WorkCrew' }] },
+        fields: [{ key: 'brand_name', label: 'Brand name', placeholder: 'e.g. FounderOS' }] },
       { key: 'partnership', label: 'Partnership & Influencer', endpoint: 'partnership/discover',
         blurb: 'Discovers potential partners/podcasts/communities via Reddit + HN.',
         fields: [{ key: 'query', label: 'Topic', placeholder: 'e.g. B2B SaaS podcasts' }] },

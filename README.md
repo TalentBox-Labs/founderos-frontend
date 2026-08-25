@@ -1,6 +1,6 @@
-# WorkCrew CRM — Frontend
+# FounderOS — Frontend
 
-React (Vite) frontend for the WorkCrew CRM platform. Connects to the FastAPI
+React (Vite) frontend for the FounderOS CRM platform. Connects to the FastAPI
 backend in [`founderos-backend`](https://github.com/TalentBox-Labs/founderos-backend)
 (`runner_api.py`), which this repo is checked out as a git submodule for
 local production builds — see that repo's Dockerfile.
