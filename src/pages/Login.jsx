@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import api, { setApiKey, setAuthed } from '../api.js'
+import { loginFounderOS, isHumanIdentity, setApiKey } from '../api.js'
 
 export default function Login() {
-  const [key, setKey] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [serviceKey, setServiceKey] = useState('')
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
 
@@ -10,18 +12,24 @@ export default function Login() {
     e.preventDefault()
     setBusy(true)
     setError(null)
-    setApiKey(key.trim())
+    const trimmedKey = serviceKey.trim()
     try {
-      // Any authenticated endpoint works as a key check.
-      await api.get('/api/v1/heartbeat/status')
-      setAuthed(true)
-      // Full reload so the app shell re-evaluates auth state (nav menu etc.)
+      const data = await loginFounderOS(email.trim(), password)
+      const identity = data?.identity
+      if (!isHumanIdentity(identity)) {
+        setError('This account is not a Founder OS human session.')
+        return
+      }
+      if (trimmedKey) setApiKey(trimmedKey)
       window.location.hash = '#/'
-      window.location.reload()
+      if (import.meta.env.MODE !== 'test') window.location.reload()
     } catch (err) {
-      setApiKey('')
-      if (err.response?.status === 401) {
-        setError('Invalid API key. Ask your admin for the RUNNER_API_KEY value.')
+      const status = err.response?.status
+      const detail = err.response?.data?.detail
+      if (status === 401) {
+        setError('Invalid email or password.')
+      } else if (status === 429) {
+        setError(typeof detail === 'string' ? detail : 'Too many login attempts. Try later.')
       } else {
         setError('Cannot reach the backend. Is the API running?')
       }
@@ -38,8 +46,9 @@ export default function Login() {
       <div className="card" style={{ width: '420px', maxWidth: '90vw' }}>
         <h1 style={{ marginBottom: '0.5rem' }}>FounderOS</h1>
         <p style={{ color: '#666', marginBottom: '1.5rem' }}>
-          Enter the team API key to sign in. In development with no
-          <code> RUNNER_API_KEY</code> set on the server, leave it blank.
+          Sign in with your Founder OS account. The team API key is a separate
+          service credential for routes that still require <code>RUNNER_API_KEY</code>
+          — it is not your identity.
         </p>
 
         {error && (
@@ -53,17 +62,41 @@ export default function Login() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>API Key</label>
+            <label htmlFor="founder-email">Email</label>
             <input
-              type="password"
-              value={key}
-              onChange={e => setKey(e.target.value)}
-              placeholder="team API key (blank in dev mode)"
+              id="founder-email"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
               autoFocus
             />
           </div>
+          <div className="form-group">
+            <label htmlFor="founder-password">Password</label>
+            <input
+              id="founder-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="runner-api-key">Service API key (optional)</label>
+            <input
+              id="runner-api-key"
+              type="password"
+              value={serviceKey}
+              onChange={e => setServiceKey(e.target.value)}
+              placeholder="RUNNER_API_KEY — not human identity"
+            />
+          </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'Checking…' : 'Sign In'}
+            {busy ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
       </div>
